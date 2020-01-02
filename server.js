@@ -1,18 +1,16 @@
 'use strict';
+const Datastore = require('nedb'), db = new Datastore({filename: '.data/datafile', autoload: true});
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
-var express = require('express');
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
+const url = require('url');
 
-var cors = require('cors');
+const app = express();
 
-var app = express();
-
-// Basic Configuration 
-var port = process.env.PORT || 3000;
-
-/** this project needs a db !! **/ 
-// mongoose.connect(process.env.MONGOLAB_URI);
+// Basic Configuration
+const port = process.env.PORT || 3000;
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(cors());
 
@@ -20,18 +18,25 @@ app.use(cors());
 // you should mount the body-parser here
 
 app.use('/public', express.static(process.cwd() + '/public'));
-
-app.get('/', function(req, res){
-  res.sendFile(process.cwd() + '/views/index.html');
+app.use(function(req, res, next) {
+    console.log(req.method + " " + req.path + " - " + req.ip + " - " + req.url);
+    next();
 });
 
-  
-// your first API endpoint... 
+app.get('/', function (req, res) {
+    res.sendFile(process.cwd() + '/views/index.html');
+});
+
+// your first API endpoint...
 app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+    res.json({greeting: 'hello API'});
 });
 
+app.post("/api/shorturl/new", function (req, res) {
+    console.log(req.body);
+    console.log(req.params);
+});
 
 app.listen(port, function () {
-  console.log('Node.js listening ...');
+    console.log(`Express is listening on port ${port}.`);
 });
